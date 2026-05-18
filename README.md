@@ -21,12 +21,72 @@ Execute the C Program for the desired output.
 # PROGRAM:
 
 ## C program that receives a message from message queue and display them
+nano receiver.c
+```
+
+ #include <stdio.h>
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
+
+struct message {
+    long type;
+    char text[100];
+};
+
+int main() {
+    key_t key = ftok(".", 'a');
+    int msgid = msgget(key, 0666 | IPC_CREAT);
+    struct message msg;
+    
+    printf("Waiting for message...\n");
+    msgrcv(msgid, &msg, sizeof(msg.text), 1, 0);
+    printf("Received: %s\n", msg.text);
+    
+    return 0;
+}
+```
+```
+nano sender.c
+
+ #include <stdio.h>
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
+ #include <string.h>
+
+struct message {
+    long type;
+    char text[100];
+};
+
+int main() {
+    key_t key = ftok(".", 'a');
+    int msgid = msgget(key, 0666 | IPC_CREAT);
+    struct message msg;
+    
+    msg.type = 1;
+    strcpy(msg.text, "Hello Thaarakeshwar");
+    
+    msgsnd(msgid, &msg, sizeof(msg.text), 0);
+    printf("Sent: %s\n", msg.text);
+    
+    return 0;
+}
+```
+gcc receiver.c -o receiver
+
+./receiver
+
+gcc sender.c -o sender
+
+./sender
 
 
 
 
+## OUTPUT 
+<img width="299" height="90" alt="image" src="https://github.com/user-attachments/assets/4ef2376e-050d-4f30-89b3-40fc1f04adab" />
 
-## OUTPUT
+<img width="284" height="101" alt="image" src="https://github.com/user-attachments/assets/9cdf0d2a-6f3a-40d8-b52c-012a0414224a" />
 
 
 
